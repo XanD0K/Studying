@@ -1,0 +1,14 @@
+.PHONY: all clean run
+
+all: programa  #  Allows to compile the program just by using 'make' 
+
+clean:
+    rm -f *.o programa  # erases all *.o files and the executable
+
+run: programa
+    ./programa
+
+
+# 'all', 'clean' and 'run' are false targets
+# If missing one, and there is a file with the same name in the folder, Make wo'nt run the command
+# Don't put in .PHONY: executable, .o files,

@@ -1,0 +1,26 @@
+CC = clang
+CFLAGS = -fsanitize=signed-integer-overflow -fsanitize=undefined \
+         -ggdb3 -O0 -std=c11 -Wall -Werror -Wextra \
+         -Wno-sign-compare -Wno-unused-parameter -Wno-unused-variable \
+         -Wno-unused-but-set-variable -Wshadow
+LDLIBS = -lcs50 -lm -lcrypt
+
+# Executable
+EXE = hello
+
+# Main rule
+$(EXE): $(EXE).c
+	$(CC) $(CFLAGS) -o $@ $^ $(LDLIBS)
+
+# 'make'
+all: $(EXE)
+
+# Cleans everything
+clean:
+	rm -f *.o $(EXE)
+
+# Clean + Recompile
+rebuild: clean all
+
+# Fake targets
+.PHONY: all clean rebuild

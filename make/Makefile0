@@ -1,0 +1,13 @@
+program: main.o util.o
+    gcc main.o util.o -o program
+
+main.o: main.c
+    gcc -c main.c -o main.o
+
+util.o: util.c
+    gcc -c util.c -o util.o
+
+
+# It says program relies on main.o and util.o
+# main.o relies on main.c
+# util.o relies on util.c
