@@ -1,0 +1,30 @@
+# ====================== DIRETÓRIOS ======================
+INCLUDE_DIR = ../include   # onde ficam os .h
+OBJ_DIR     = obj          # onde vão ficar os .o
+LIB_DIR     = ../lib       # (se você tiver libs próprias)
+
+# ====================== COMPILADOR E FLAGS ======================
+CC       = clang
+CPPFLAGS = -I$(INCLUDE_DIR)          # ← só o -I aqui!
+CFLAGS   = -Wall -Wextra -Werror -O2 -g   # ← flags "de verdade"
+LDFLAGS  = -L$(LIB_DIR)
+LDLIBS   = -lm
+
+# ====================== ARQUIVOS ======================
+_HEADERS = hellomake.h
+HEADERS  = $(addprefix $(INCLUDE_DIR)/,$(_HEADERS))
+
+_SOURCES = hellomake.c hellofunc.c
+OBJECTS  = $(addprefix $(OBJ_DIR)/,$(_SOURCES:.c=.o))
+
+# ====================== REGRAS ======================
+$(OBJ_DIR)/%.o: %.c $(HEADERS)
+	@mkdir -p $(OBJ_DIR)
+	$(CC) -c -o $@ $< $(CPPFLAGS) $(CFLAGS)
+
+hellomake: $(OBJECTS)
+	$(CC) -o $@ $^ $(LDFLAGS) $(LDLIBS)
+
+.PHONY: clean
+clean:
+	rm -rf $(OBJ_DIR) *~ core

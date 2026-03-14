@@ -1,29 +1,47 @@
-IDIR = ../include  # .h files
-CC = clang
-CFLAGS = -I$(IDIR)
+# ====================== DIRECTORIES ======================
+INCLUDE_DIR = ../include   # where .h files live
+OBJDIR      = obj          # where .o files will be placed
+LIBDIR      = ../lib       # (optional - for your own .a libraries)
 
-ODIR = obj  # .o files
-LDIR = ../lib
+# ====================== COMPILER AND FLAGS ======================
+CC       = clang
+CPPFLAGS = -I$(INCLUDE_DIR)          # headers + defines only (-I, -D, etc.)
+CFLAGS   = -Wall -Wextra -Werror -O2 -g   # compiler warnings, optimization, debug
+LDFLAGS  =                           # linker flags (-L, etc.) - empty for now
+LDLIBS   = -lm                       # libraries to link (-lm = math library)
 
-LIBS = -lm
+# ====================== SOURCE FILES ======================
+# List of headers (without path)
+_HEADERS = hellomake.h
 
-_DEPS = hellomake.h
-DEPS = $(patsubst %,$(IDIR)/%,$(_DEPS))
+# Full path to headers
+HEADERS  = $(addprefix $(INCLUDE_DIR)/,$(_HEADERS))
 
-_OBJ = hellomake.o hellofunc.o
-OBJ = $(patsubst %,$(ODIR)/%,$(_OBJ))
+# List of source files (.c)
+SOURCES  = hellomake.c hellofunc.c
 
+# Object files with full path
+OBJECTS  = $(addprefix $(OBJDIR)/,$(SOURCES:.c=.o))
 
-$(ODIR)/%.o: %.c $(DEPS)
-	$(CC) -c -o $@ $< $(CFLAGS)
+# Final executable name
+TARGET   = hellomake
 
-hellomake: $(OBJ)
-	$(CC) -o $@ $^ $(CFLAGS) $(LIBS)
+# ====================== BUILD RULES ======================
 
+# Pattern rule: how to compile each .c → .o
+$(OBJDIR)/%.o: %.c $(HEADERS)
+	@mkdir -p $(OBJDIR)                  # create obj/ folder if it doesn't exist
+	$(CC) -c -o $@ $< $(CPPFLAGS) $(CFLAGS)
+
+# Link rule: build the final executable
+$(TARGET): $(OBJECTS)
+	$(CC) -o $@ $^ $(LDFLAGS) $(LDLIBS)
+
+# ====================== CLEAN ======================
 .PHONY: clean
 
 clean:
-	rm -f $(ODIR)/*.o *~ core $(INCDIR)/*~
+	rm -rf $(OBJDIR) *~ core
 
 
 # What if we want to put .h files in an 'include' directory, source in 'src' directory and local libs in a 'lib' directory?

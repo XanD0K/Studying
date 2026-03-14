@@ -78,8 +78,27 @@ BAR = hello
 In this example, FOO is empty, because BAR didn't exist on declaration
 
 
-LDLIBS → external libraries
 
+# Diretórios
+IDIR / INCLUDE_DIR = ../include
+ODIR / OBJDIR = obj
+@mkdir -p $(OBJDIR) → automatically creates de OBJ dir
+LDIR / LIBDIR = ../lib
+OBJ / SRCDIR = .
+BIN / BINDIR
+
+# Compilador e flags
+CC       = clang
+CPPFLAGS = -I$(INCLUDE_DIR)
+CFLAGS   = -Wall -Wextra -Werror -O2 -g
+LDFLAGS  =
+LIBS / LDLIBS   = -lm
+
+# Arquivos
+DEPS / HEADERS  = hellomake.h
+SOURCES  = hellomake.c hellofunc.c
+OBJECTS  = $(addprefix $(OBJDIR)/,$(SOURCES:.c=.o))
+TARGET   = hellomake
 */
 
 
