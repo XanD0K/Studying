@@ -1,0 +1,62 @@
+# ====================================== DIRECTORIES ======================================
+SRCDIR = src
+IDIR   = include
+ODIR   = obj
+BINDIR = bin
+
+# ========================================= FLAGS =========================================
+CC 		 = clang
+CPPFLAGS = -I$(IDIR)
+DEPFLAGS = -MMD -MP
+CPPFLAGS += $(DEPFLAGS)
+CFLAGS   = -Wall -Wextra -Werror -O2 -g
+
+# ====================================== SOURCE FILES =====================================
+SRC = $(wildcard $(SRCDIR)/*.c)
+OBJ = $(addprefix $(ODIR)/,$(notdir $(SRC:.c=.o)))
+EXE = $(BINDIR)/hello
+
+# ====================================== BUILD RULES ======================================
+$(ODIR) $(BINDIR):
+	@mkdir -p $@
+
+$(ODIR)/%.o: $(SRCDIR)/%.c | $(ODIR)
+	$(CC) $(CPPFLAGS) $(CFLAGS) -c $< -o $@
+
+$(EXE): $(OBJ) | $(BINDIR)
+	$(CC) $(CFLAGS) $^ -o $@
+
+# ======================================== TARGETS ========================================
+all: $(EXE)
+
+clean:
+	rm -rf $(ODIR) $(BINDIR)
+
+rebuild: clean all
+
+run: $(EXE)
+	./$(EXE)
+
+install: $(EXE)
+	cp $(EXE) /usr/local/bin/
+
+debug:
+	$(MAKE) CFLAGS="$(CFLAGS) -g -O0" all
+
+release:
+	$(MAKE) CFLAGS="$(CFLAGS) -O3 -DNDEBUG" all
+
+help:
+	@echo "=== AVAILABLE COMMANDS ==="
+	@echo "  make              → compiles programs"
+	@echo "  make run          → compiles and executes"
+	@echo "  make clean        → erases .o and executable"
+	@echo "  make rebuild      → cleans and recompiles"
+	@echo "  make debug        → compiles with debug (-g -O0)"
+	@echo "  make release      → compiles for optimization (-O3)"
+	@echo "  make install      → installs in /usr/local/bin"
+	@echo "  make help         → shows this help"
+
+.PHONY: all clean debug help install rebuild release run
+
+-include $(OBJ:.o=.d)

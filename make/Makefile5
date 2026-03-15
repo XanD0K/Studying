@@ -1,50 +1,44 @@
 # ====================== DIRECTORIES ======================
-SRCDIR      = src          # onde ficam todos os .c
-INCLUDE_DIR = include      # onde ficam todos os .h
-OBJDIR      = obj          # onde vão os .o (na raiz)
-BINDIR      = bin          # onde vai o executável final
+INCLUDE_DIR = include   # where .h files live
+OBJDIR      = obj          # where .o files will be placed
+LIBDIR      = lib       # (optional - for your own .a libraries)
 
 # ====================== COMPILER AND FLAGS ======================
 CC       = clang
-CPPFLAGS = -I$(INCLUDE_DIR)
-CFLAGS   = -Wall -Wextra -Werror -O2 -g
-LDFLAGS  =
-LDLIBS   = -lm
+CPPFLAGS = -I$(INCLUDE_DIR)          # headers + defines only (-I, -D, etc.)
+CFLAGS   = -Wall -Wextra -Werror -O2 -g   # compiler warnings, optimization, debug
+LDFLAGS  =                           # linker flags (-L, etc.) - empty for now
+LDLIBS   = -lm                       # libraries to link (-lm = math library)
 
 # ====================== SOURCE FILES ======================
-# Pega TODOS os .c automaticamente (não precisa listar um por um)
-SOURCES  = $(wildcard $(SRCDIR)/*.c)
+# List of headers (without path)
+_HEADERS = hellomake.h
 
-# Headers (liste só os que você usa)
-_HEADERS  = hello.h hello2.h
-HEADERS   = $(addprefix $(INCLUDE_DIR)/,$(_HEADERS))
+# Full path to headers
+HEADERS  = $(addprefix $(INCLUDE_DIR)/,$(_HEADERS))
 
-# Object files (transforma .c em .o dentro de obj/)
-OBJECTS  = $(addprefix $(OBJDIR)/,$(notdir $(SOURCES:.c=.o)))
+# List of source files (.c)
+SOURCES  = hellomake.c hellofunc.c
 
-# Nome do executável final
-TARGET   = $(BINDIR)/hello
+# Object files with full path
+OBJECTS  = $(addprefix $(OBJDIR)/,$(SOURCES:.c=.o))
+
+# Final executable name
+TARGET   = hellomake
 
 # ====================== BUILD RULES ======================
+# Pattern rule: how to compile each .c → .o
+# create obj/ folder if it doesn't exist
+$(OBJDIR)/%.o: %.c $(HEADERS)
+	@mkdir -p $(OBJDIR)
+	$(CC) $(CPPFLAGS) $(CFLAGS) -c $< -o $@ 
 
-# Cria as pastas automaticamente
-$(OBJDIR) $(BINDIR):
-	@mkdir -p $@
-
-# Compila cada .c → .o
-$(OBJDIR)/%.o: $(SRCDIR)/%.c $(HEADERS) | $(OBJDIR)
-	$(CC) -c -o $@ $< $(CPPFLAGS) $(CFLAGS)
-
-# Linka tudo e gera o executável
-$(TARGET): $(OBJECTS) | $(BINDIR)
-	$(CC) -o $@ $^ $(LDFLAGS) $(LDLIBS)
-
-# Regra padrão (o que acontece quando você digita só "make")
-all: $(TARGET)
+# Link rule: build the final executable
+$(TARGET): $(OBJECTS)
+	$(CC) $(CFLAGS) $(LDFLAGS) $^ -o $@ $(LDLIBS)
 
 # ====================== CLEAN ======================
 .PHONY: clean
-clean:
-	rm -rf $(OBJDIR) $(BINDIR)
 
-.PHONY: all
+clean:
+	rm -rf $(OBJDIR)

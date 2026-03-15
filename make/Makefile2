@@ -1,14 +1,67 @@
-.PHONY: all clean run
+# ======================================== CONFIGURATION ========================================
+CC 		 = clang
+CPPFLAGS = -I.  # Only used on compilation, never on linking
+CFLAGS   = -Wall -Wextra -Werror -O2
+LDFLAGS  =  # Linker (Paths to libraries) → currently empty (e.g. LDFLAGS = -L$(LDIR)  // LDIR = lib)
+LDLIBS   = -lcs50 -lm -lcrypt  # Libraries to link
+DEPS 	 = hellomake.h
+OBJ 	 = hellomake.o hellofunc.o
+EXE 	 = hellomake
+LDLIBS 	 = -lcs50 -lm -lcrypt
 
-all: programa  #  Allows to compile the program just by using 'make' 
+# ======================================== MAIN RULES ========================================
+%.o: %.c $(DEPS)
+	$(CC) $(CPPFLAGS) $(CFLAGS) -c $< -o $@
 
+$(EXE): $(OBJ)
+	$(CC) $(CFLAGS) $(LDFLAGS) $^ -o $@ $(LDLIBS)
+
+# ======================================== TARGETS ========================================
+# Allows to compile the program just by using 'make'
+# ALWAYS USE!
+all: $(EXE)
+
+# Erases all *.o files and the executable
+# Used to force a recompilation, before commit to Git, clean cache, before release, etc.
+# ALWAYS USE!
 clean:
-    rm -f *.o programa  # erases all *.o files and the executable
+	rm -rf *.o $(EXE)
 
-run: programa
-    ./programa
+rebuild: clean all
+
+# Builds and runs the program
+run: $(EXE)
+	./$(EXE)
+
+# Installs executable on sistem, to be used as a command
+install: $(EXE)
+	cp $(EXE) /usr/local/bin/          # ou ~/bin se preferir
+
+# Compiles with debug (gdb, valgrind, etc)
+debug:
+	$(MAKE) CFLAGS="$(CFLAGS) -g -O0" all
+
+# Compiles with optimization (release)
+release:
+	$(MAKE) CFLAGS="$(CFLAGS) -O3 -DNDEBUG" all
+
+# Shows available commands
+help:
+	@echo "=== Comandos disponíveis ==="
+	@echo "  make              → compila o programa"
+	@echo "  make run          → compila e executa"
+	@echo "  make clean        → apaga .o e executável"
+	@echo "  make rebuild      → limpa + recompila"
+	@echo "  make debug        → compila com debug (-g -O0)"
+	@echo "  make release      → compila otimizado (-O3)"
+	@echo "  make install      → instala em /usr/local/bin"
+	@echo "  make help         → mostra esta ajuda"
+
+.PHONY: all clean rebuild run install debug release help
 
 
 # 'all', 'clean' and 'run' are false targets
 # If missing one, and there is a file with the same name in the folder, Make wo'nt run the command
 # Don't put in .PHONY: executable, .o files,
+
+# $(MAKE) is the 'make' command in the terminal

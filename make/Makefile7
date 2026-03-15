@@ -1,0 +1,49 @@
+# ====================== DIRECTORIES ======================
+SRCDIR      = src          # onde ficam todos os .c
+INCLUDE_DIR = include      # onde ficam todos os .h
+OBJDIR      = obj          # onde vão os .o (na raiz)
+BINDIR      = bin          # onde vai o executável final
+
+# ====================== COMPILER AND FLAGS ======================
+CC       = clang
+CPPFLAGS = -I$(INCLUDE_DIR)
+CFLAGS   = -Wall -Wextra -Werror -O2 -g
+LDFLAGS  =
+LDLIBS   = -lm
+
+# ====================== SOURCE FILES ======================
+# Pega TODOS os .c automaticamente (não precisa listar um por um)
+SOURCES  = $(wildcard $(SRCDIR)/*.c)
+
+# Headers (liste só os que você usa)
+_HEADERS  = hello.h hello2.h
+HEADERS   = $(addprefix $(INCLUDE_DIR)/,$(_HEADERS))
+
+# Object files (transforma .c em .o dentro de obj/)
+OBJECTS  = $(addprefix $(OBJDIR)/,$(notdir $(SOURCES:.c=.o)))
+
+# Nome do executável final
+TARGET   = $(BINDIR)/hello
+
+# ====================== BUILD RULES ======================
+
+# Cria as pastas automaticamente
+$(OBJDIR) $(BINDIR):
+	@mkdir -p $@
+
+# Compila cada .c → .o
+$(OBJDIR)/%.o: $(SRCDIR)/%.c $(HEADERS) | $(OBJDIR)
+	$(CC) -c -o $@ $< $(CPPFLAGS) $(CFLAGS)
+
+# Linka tudo e gera o executável
+$(TARGET): $(OBJECTS) | $(BINDIR)
+	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $^ $(LDLIBS)
+
+# ====================== TARGETS ======================
+# Regra padrão (o que acontece quando você digita só "make")
+all: $(TARGET)
+
+clean:
+	rm -rf $(OBJDIR) $(BINDIR)
+
+.PHONY: all clean

@@ -25,6 +25,7 @@ hellomake: $(OBJ)
 clean:
 	rm -f $(ODIR)/*.o *~ core $(INCDIR)/*~
 
+
 # What if we want to put .h files in an 'include' directory, source in 'src' directory and local libs in a 'lib' directory?
 
 # Defines paths to the 'include' and 'lib' directories
@@ -33,7 +34,10 @@ clean:
 
 # This makefile should be located in the 'src' directory
 
-# 'patsubst' → creates the full path
+# $(patsubst padrão,substituição,lista)
+# 'patsubst' → pattern substitute → creates the full path
+# Default is % → stands for everything. Gets the name without extension
+# Gets every item in _OBJ and substitute for ODIR
 
 # src/ → all .c files
 # include/ → all .h files
@@ -45,6 +49,9 @@ clean:
 # It also includes a rule for cleaning up your source and object directories if you type make clean
 # The .PHONY rule keeps Make from doing something with a file named clean (if you have a file with that same name)
 # 'make clean' → erases all .o files and all temporary files
+# -rf recursivelly forces the remove → It makes the command erases the directories as well
+# -f → just remove the files
+
 # You can add multiple rules to a makefile; you can even create rules that call other rules
 
 

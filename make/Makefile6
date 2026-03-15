@@ -1,22 +1,18 @@
 # ====================== DIRECTORIES ======================
-INCLUDE_DIR = ../include   # where .h files live
+INCLUDE_DIR = include   # where .h files live
 OBJDIR      = obj          # where .o files will be placed
-LIBDIR      = ../lib       # (optional - for your own .a libraries)
+LIBDIR      = lib       # (optional - for your own .a libraries)
 
 # ====================== COMPILER AND FLAGS ======================
 CC       = clang
 CPPFLAGS = -I$(INCLUDE_DIR)          # headers + defines only (-I, -D, etc.)
+DEPFLAGS = -MMD -MP
+CPPFLAGS += $(DEPFLAGS)
 CFLAGS   = -Wall -Wextra -Werror -O2 -g   # compiler warnings, optimization, debug
 LDFLAGS  =                           # linker flags (-L, etc.) - empty for now
 LDLIBS   = -lm                       # libraries to link (-lm = math library)
 
 # ====================== SOURCE FILES ======================
-# List of headers (without path)
-_HEADERS = hellomake.h
-
-# Full path to headers
-HEADERS  = $(addprefix $(INCLUDE_DIR)/,$(_HEADERS))
-
 # List of source files (.c)
 SOURCES  = hellomake.c hellofunc.c
 
@@ -27,18 +23,21 @@ OBJECTS  = $(addprefix $(OBJDIR)/,$(SOURCES:.c=.o))
 TARGET   = hellomake
 
 # ====================== BUILD RULES ======================
-
 # Pattern rule: how to compile each .c → .o
-$(OBJDIR)/%.o: %.c $(HEADERS)
-	@mkdir -p $(OBJDIR)                  # create obj/ folder if it doesn't exist
-	$(CC) -c -o $@ $< $(CPPFLAGS) $(CFLAGS)
+# create obj/ folder if it doesn't exist
+$(OBJDIR)/%.o: %.c
+	@mkdir -p $(OBJDIR)
+	$(CC) $(CPPFLAGS) $(CFLAGS) -c $< -o $@ 
 
 # Link rule: build the final executable
 $(TARGET): $(OBJECTS)
-	$(CC) -o $@ $^ $(LDFLAGS) $(LDLIBS)
+	$(CC) $(CFLAGS) $(LDFLAGS) $^ -o $@ $(LDLIBS)
 
 # ====================== CLEAN ======================
 .PHONY: clean
 
 clean:
-	rm -rf $(OBJDIR) *~ core
+	rm -rf $(OBJDIR)
+
+# Creates the dependency files (.d)
+-include $(OBJECTS:.o=.d)

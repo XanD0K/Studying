@@ -1,30 +1,35 @@
-# ====================== DIRETÓRIOS ======================
-INCLUDE_DIR = ../include   # onde ficam os .h
-OBJ_DIR     = obj          # onde vão ficar os .o
-LIB_DIR     = ../lib       # (se você tiver libs próprias)
+# ====================== DIRECTORIES ======================
+IDIR = include
+ODIR = obj
+LDIR = lib
 
-# ====================== COMPILADOR E FLAGS ======================
+# ====================== COMPILER AND FLAGS ======================
 CC       = clang
-CPPFLAGS = -I$(INCLUDE_DIR)          # ← só o -I aqui!
-CFLAGS   = -Wall -Wextra -Werror -O2 -g   # ← flags "de verdade"
-LDFLAGS  = -L$(LIB_DIR)
+CPPFLAGS = -I$(IDIR)
+CFLAGS   = -Wall -Wextra -Werror -O2 -g
+LDFLAGS  = -L$(LDIR)
 LDLIBS   = -lm
 
-# ====================== ARQUIVOS ======================
-_HEADERS = hellomake.h
-HEADERS  = $(addprefix $(INCLUDE_DIR)/,$(_HEADERS))
+# ====================== FILES ======================
+_DEPS = hellomake.h
+DEPS  = $(addprefix $(IDIR)/,$(_DEPS))
 
-_SOURCES = hellomake.c hellofunc.c
-OBJECTS  = $(addprefix $(OBJ_DIR)/,$(_SOURCES:.c=.o))
+_SRC = hellomake.c hellofunc.c
+OBJ  = $(addprefix $(ODIR)/,$(_SRC:.c=.o))
 
-# ====================== REGRAS ======================
-$(OBJ_DIR)/%.o: %.c $(HEADERS)
-	@mkdir -p $(OBJ_DIR)
-	$(CC) -c -o $@ $< $(CPPFLAGS) $(CFLAGS)
+# ====================== RULES ======================
+$(ODIR)/%.o: %.c $(DEPS)
+	@mkdir -p $(ODIR)
+	$(CC) $(CPPFLAGS) $(CFLAGS) -c -o $@ $< 
 
-hellomake: $(OBJECTS)
+hellomake: $(OBJ)
 	$(CC) -o $@ $^ $(LDFLAGS) $(LDLIBS)
 
-.PHONY: clean
+# ====================== TARGETS ======================
 clean:
-	rm -rf $(OBJ_DIR) *~ core
+	rm -rf $(ODIR)
+
+.PHONY: clean
+
+
+# 'addprefix' cola o prefixo na frente de cada palavra

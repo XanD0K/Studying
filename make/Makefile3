@@ -1,26 +1,58 @@
-CC = clang
-CFLAGS = -fsanitize=signed-integer-overflow -fsanitize=undefined \
-         -ggdb3 -O0 -std=c11 -Wall -Werror -Wextra \
-         -Wno-sign-compare -Wno-unused-parameter -Wno-unused-variable \
-         -Wno-unused-but-set-variable -Wshadow
-LDLIBS = -lcs50 -lm -lcrypt
+# ======================================== CONFIGURATION ========================================
+CC 		 = clang
+CPPFLAGS = -I.
+DEPFLAGS = -MMD -MP
+CPPFLAGS   += $(DEPFLAGS)
+OBJ 	 = hellomake.o hellofunc.o
+EXE 	 = hellomake
+LDLIBS 	 = -lcs50 -lm -lcrypt
 
-# Executable
-EXE = hello
+# ======================================== MAIN RULES ========================================
+%.o: %.c
+	$(CC) $(CPPFLAGS) $(CFLAGS) -c $< -o $@
 
-# Main rule
-$(EXE): $(EXE).c
-	$(CC) $(CFLAGS) -o $@ $^ $(LDLIBS)
+$(EXE): $(OBJ)
+	$(CC) $(CFLAGS) $^ -o $@
 
-# 'make'
+# ======================================== TARGETS ========================================
+# Allows to compile the program just by using 'make'
 all: $(EXE)
 
-# Cleans everything
+# Erases all *.o files and they respective directories, and the executable
 clean:
-	rm -f *.o $(EXE)
+	rm -rf *.o $(EXE)
 
-# Clean + Recompile
 rebuild: clean all
 
-# Fake targets
-.PHONY: all clean rebuild
+# Builds and runs the program
+run: $(EXE)
+	./$(EXE)
+
+# Installs executable on sistem, to be used as a command
+install: $(EXE)
+	cp $(EXE) /usr/local/bin/ 
+
+# Compiles with debug (gdb, valgrind, etc)
+debug:
+	$(MAKE) CFLAGS="$(CFLAGS) -g -O0" all
+
+# Compiles with optimization (release)
+release:
+	$(MAKE) CFLAGS="$(CFLAGS) -O3 -DNDEBUG" all
+
+# Shows available commands
+help:
+	@echo "=== Comandos disponíveis ==="
+	@echo "  make              → compila o programa"
+	@echo "  make run          → compila e executa"
+	@echo "  make clean        → apaga .o e executável"
+	@echo "  make rebuild      → limpa + recompila"
+	@echo "  make debug        → compila com debug (-g -O0)"
+	@echo "  make release      → compila otimizado (-O3)"
+	@echo "  make install      → instala em /usr/local/bin"
+	@echo "  make help         → mostra esta ajuda"
+
+.PHONY: all clean rebuild run install debug release help
+
+# Creates the dependency files (.d)
+-include $(OBJ:.o=.d)

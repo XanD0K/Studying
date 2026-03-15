@@ -18,7 +18,7 @@ hellomake: hellomake.c hellofunc.c
 # Target is everything on the left of :
 # Rule is the whole block
 # Every tule teaches Make how to build that target
-# Make always run the first rule in file. That's why the executable rule is always the first one
+# Make always run the first target rule in file. That's why the executable rule is always the first one
 
 # You can run any rule manually:
 # make hellomake → Executes the executable
