@@ -120,9 +120,16 @@ Warnings (diagnósticos) → ALWAYS USE ON DEVELOPMENT
 -Wall -Wextra -Wpedantic → Base → Always needed in most cases → Shows most erros → ALWAYS USE
 -Werror / -Werror=return-type → Transform warnings into error → ALWAYS USE
 -Weverything → (Clang only) - Too agressive → good for clean new code
--Wno-unused-parameter -Wno-unused-function -Wno-unused-variable → Turns off usual warning
 -Wconversion → Warns when mixing signed with unsigned, or float with int in a dangerous way
 -Wshadow → warns when declaring a variable with the same name as another (shadowing)
+-Wnull-dereference → dereference of null pointers
+-Wformat-security → protects agains security issues with formated functions (e.g. printf(), sprintf())
+-Wno-unused-parameter -Wno-unused-function -Wno-unused-variable → Turns off usual warning
+-Wno-unused-but-set-variable → turns off warning for declared but not used variable
+
+-Wunused-function / -Wunused-variable → warns about unused functions/variables
+
+-Wno-padded → USE WITH -Weverything → turns off warnings about paddings (extra spaces added by compiler in memory)
 
 - Wextra → Shows extra errors → Use with -Wall
 -pedantic-errors → Treats compiler's extensions (not C default) as errors. Makes you write C in ISO. Warns everything that isn't 100% C
@@ -149,16 +156,19 @@ Debug
 
 
 Sanitizers → Use one per time, carefull when mixing → Makes program slower → Use on DEBUG
+Sanitizers add run time verificatio
 -fsanitize=address (ASan) → search for memory leaks, buffer overflow, use-after-free
--fsanitize=undefined (UBSan) 
--fsanitize=thread (TSan)
+-fsanitize=undefined (UBSan) → numeric logic or bit operations → detects undefined behavios (e.g. overflow with signed integers, invalid shift)
+-fsanitize=thread (TSan) → only if uses threads. Detects race conditions in multithreading
+-fsanitize=leak → use with -fsanitize-address → detecs memory leaks
+-fsanitize=integer → detects overflows and zero divisions by integers
 
 E.g. CFLAGS += -fsanitize=address -g
 
 
 Outros úteis
--fcolor-diagnostics (color erros) / -fdiagnostics-show-caret → Imrpove erros' style in terminal
--MMD -MP → Generates .d files automatically
+-fcolor-diagnostics (color erros) / -fdiagnostics-show-caret → Improve errors' style in terminal
+-MMD -MP → Generates .d files automatically → USE IT WITH DEPFLAGS and CPPFLAGS instead of CFLAGS
 -march=native / -mtune=native → Improves to CPU
 -flto (Link Time Optimization) → Link otimization
 */

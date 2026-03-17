@@ -12,7 +12,7 @@ CPPFLAGS += $(DEPFLAGS)
 CFLAGS   = -Wall -Wextra -Werror -O2 -g
 
 # ====================================== SOURCE FILES =====================================
-SRC = $(wildcard $(SRCDIR)/*.c)
+SRC := $(wildcard $(SRCDIR)/*.c)  # := makes wildcard runs only once. Otherwise, SRC would be recalculated every time it's called
 OBJ = $(addprefix $(ODIR)/,$(notdir $(SRC:.c=.o)))
 EXE = $(BINDIR)/hello
 
@@ -21,10 +21,10 @@ $(ODIR) $(BINDIR):
 	@mkdir -p $@
 
 $(ODIR)/%.o: $(SRCDIR)/%.c | $(ODIR)
-	$(CC) $(CPPFLAGS) $(CFLAGS) -c $< -o $@
+	@$(CC) $(CPPFLAGS) $(CFLAGS) -c $< -o $@
 
 $(EXE): $(OBJ) | $(BINDIR)
-	$(CC) $(CFLAGS) $^ -o $@
+	@$(CC) $(CFLAGS) $^ -o $@
 
 # ======================================== TARGETS ========================================
 all: $(EXE)
@@ -48,7 +48,7 @@ release:
 
 help:
 	@echo "=== AVAILABLE COMMANDS ==="
-	@echo "  make              → compiles programs"
+	@echo "  make              → compiles program"
 	@echo "  make run          → compiles and executes"
 	@echo "  make clean        → erases .o and executable"
 	@echo "  make rebuild      → cleans and recompiles"
@@ -60,3 +60,8 @@ help:
 .PHONY: all clean debug help install rebuild release run
 
 -include $(OBJ:.o=.d)
+
+
+# @$(CC) $(CFLAGS) $^ -o $@
+# The @ sign in the start suppresses echoing
+# It tells Make not to print the command before executing it, keeping the terminal cleaner
