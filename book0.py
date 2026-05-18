@@ -1,3 +1,5 @@
+import sys
+
 class Book:
     def __init__(self, title, author, total_pages):
         self.title = title
